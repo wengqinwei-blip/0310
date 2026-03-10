@@ -1,0 +1,144 @@
+import java.util.Random;
+import java.util.Scanner;
+
+import javax.print.DocFlavor.STRING;
+
+public class Assignment1{
+    static class Player{
+        
+        private int id;
+        private String  role;
+        private boolean alive;
+        
+        public Player(){
+            this.id = id; 
+            this.role = role;
+            this.alive = true;
+        }
+
+        public int getID(){
+            return id;
+        }
+
+        public String getRole(){
+            return role;
+        }
+
+        public boolean isAlive(){
+            return alive;
+        }
+
+        public void kill(){
+            alive = false;
+        }
+
+        public String getPublicInfo(){
+            if(alive){
+                return "Player " + id + ":[Alive]";
+            }else{
+                return "Player " + id + ":[Dead]";
+            }
+        }
+        public static void main(String[] args){
+
+            Scanner sc = new Scanner(System.in);
+            Random rand = new Random();
+
+            System.out.println("wolfGame");
+            System.out.println("Enter number  players (4~10)");
+            int n = sc.nextInt();
+            sc.nextLine();
+
+            while (n < 4 || n > 10){
+                System.out.println(" number 4~10");
+                n = sc.nextInt();
+                sc.nextLine();
+            }
+
+            Player[] players = new Player[n];
+            int wolfIndex = rand.nextInt();
+            
+            for (int i = 0; i < n; i++){
+                if (i == wolfIndex){
+                    players[i] = new Player(i+1, role = "Werewolf");
+                }else{
+                    players[i] = new Player(i+1, role = "Villager");
+                }
+            }
+        
+            System.out.println();
+            System.out.print("Role assignmebt start");
+            System.out.print("Each player take turn to role.")
+                    
+                for(int i = 0; i < n; i++){
+                        System.out.println();
+                        System.out.println("Player" + (i + 1) + "Please Enter");
+                        sc.nextLine();
+                        System.out.println("Your Role : " + players[i].getRole());
+                        System.out.println("Memorize your role");
+                        sc.nextLine();
+                        for (int line = 0; line < 30; line++){
+                            System.out.println();
+                       
+
+}
+                }
+
+                boolean gameOver = false;
+                int round = 1;
+
+                while(!gameOver){
+                    System.out.println("Round" + round);
+                    System.out.println();
+                    System.out.println("Night falls. Werewolf wakes up.");
+                    int alliveWereWolf = findAliveWereWolf(players);
+                    if (alliveWereWolf != -1){
+                        System.out.println("Werewolf is your turn.");
+                        System.out.println("Alive players ");
+                        printAlivePlayers(players);
+
+                        int target = -1;
+                        while (true) {
+                            System.out.println("choose a player to kill");
+                            if  (sc.hasNext()){
+                                targetID = sc.nextInt();
+                                sc.nextLine();
+                                if(isValidTarget(targetID, players[alliveWereWolf].getID())){
+                                    break;
+                                } else{
+                                    System.out.println("Invalid target.Please ");
+                                    sc.nextLine();
+                                }
+                            }
+                        }
+                        players[targetID - 1].kill();
+                        System.out.println("Night results: Player" + targetID + "has beed killed.");
+                    }else{
+                        System.out.println("No werewolf alive. Skip");
+                    }
+                    if(checkKillvillargewin(players)){
+                        System.out.println("Villagers Win! All werewolvers has die");
+                        gameOver = true;
+                    }else if (checkkillwerewolfwin(players)){
+                        System.out.println();
+                        System.out.println("Werewolf wins! All villagers has die");
+                        gameOver = true;
+                    }
+                    if(gameOver){
+                        break;
+                    }
+                    int voteID = -1;
+                    public static int printAliveWolf(Player[] players){
+                        for (int i = 0; i < players.length; i++){
+                            if (players[i].isAlive() && players[i].getRole().equals("Werewolf")){
+                                return i;
+                            }
+                        }
+                        return -1;
+                    }
+                 
+                    
+                }
+        } 
+    }
+}
