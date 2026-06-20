@@ -1,0 +1,83 @@
+import java.util.Scanner;
+
+// 1. 類別 (Class)：定義玩家資訊
+class Player {
+    String name;
+    String role;
+    boolean isAlive = true;
+
+    public Player(String name, String role) {
+        this.name = name;
+        this.role = role;
+    }
+}
+
+public class TeachingWerewolfGame {
+    static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        System.out.println("=== 歡迎來到狼人殺教學版 ===");
+        System.out.print("請輸入玩家總人數: ");
+        int num = scanner.nextInt();
+        Player[] players = setupGame(num); // 角色分配
+
+        while (true) {
+            // 2. 夜間行動
+            nightPhase(players);
+            if (checkWinCondition(players)) break;
+
+            // 3. 白天投票
+            dayPhase(players);
+            if (checkWinCondition(players)) break;
+        }
+    }
+
+    // 角色分配邏輯
+    public static Player[] setupGame(int n) {
+        Player[] players = new Player[n];
+        players[0] = new Player("玩家 1", "狼人"); // 預設 1 號為狼人
+        for (int i = 1; i < n; i++) players[i] = new Player("玩家 " + (i + 1), "村民");
+        System.out.println("角色已分配 (1號為狼人，其餘為村民)。");
+        return players;
+    }
+
+    // 夜間行動：狼人殺人
+    public static void nightPhase(Player[] players) {
+        System.out.println("\n[夜晚] 狼人請選擇一位受害者編號 (1-" + players.length + "):");
+        int target = scanner.nextInt() - 1;
+        if (target >= 0 && target < players.length && players[target].isAlive) {
+            players[target].isAlive = false;
+            System.out.println(players[target].name + " 被狼人殺害了！");
+        }
+    }
+
+    // 白天投票
+    public static void dayPhase(Player[] players) {
+        System.out.println("\n[白天] 請輸入要投票放逐的玩家編號:");
+        int target = scanner.nextInt() - 1;
+        if (target >= 0 && target < players.length && players[target].isAlive) {
+            players[target].isAlive = false;
+            System.out.println(players[target].name + " 被村民票選出局！");
+        }
+    }
+
+    // 4. 勝負判定邏輯
+    public static boolean checkWinCondition(Player[] players) {
+        int wolves = 0, villagers = 0;
+        for (Player p : players) {
+            if (p.isAlive) {
+                if (p.role.equals("狼人")) wolves++;
+                else villagers++;
+            }
+        }
+
+        if (wolves == 0) {
+            System.out.println("\n遊戲結束：狼人全滅，村民獲勝！");
+            return true;
+        } else if (wolves >= villagers) {
+            System.out.println("\n遊戲結束：狼人數量已達半數，狼人獲勝！");
+            return true;
+        }
+        return false;
+    }
+}
