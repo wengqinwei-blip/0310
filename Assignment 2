@@ -1,0 +1,91 @@
+import java.util.Scanner;
+
+// --- 抽象父類別 (所有角色的基礎) ---
+abstract class Player {
+    private String name, role, camp;
+    private boolean isAlive = true;
+
+    public Player(String name, String role, String camp) {
+        this.name = name; this.role = role; this.camp = camp;
+    }
+    public String getName() { return name; }
+    public String getRole() { return role; }
+    public String getCamp() { return camp; }
+    public boolean isAlive() { return isAlive; }
+    public void setAlive(boolean a) { isAlive = a; }
+    public abstract void performNightAction(Player[] p, Scanner sc);
+}
+
+// --- 各職業類別 ---
+class Werewolf extends Player {
+    public Werewolf(String n) { super(n, "狼人", "壞人"); }
+    public void performNightAction(Player[] p, Scanner sc) {
+        if(!isAlive()) return;
+        System.out.println(getName() + " (狼人)，請輸入要擊殺的編號:");
+        int t = sc.nextInt();
+        if (t >= 0 && t < p.length && p[t].isAlive()) { p[t].setAlive(false); System.out.println(">> " + p[t].getName() + " 已死亡。"); }
+    }
+}
+class Seer extends Player {
+    public Seer(String n) { super(n, "預言家", "好人"); }
+    public void performNightAction(Player[] p, Scanner sc) {
+        if(!isAlive()) return;
+        System.out.println(getName() + " (預言家)，請輸入要查驗的編號:");
+        int t = sc.nextInt();
+        System.out.println(">> 查驗結果：" + p[t].getName() + " 是 " + p[t].getCamp());
+    }
+}
+class Witch extends Player { public Witch(String n) { super(n, "女巫", "好人"); } public void performNightAction(Player[] p, Scanner sc) {} }
+class Hunter extends Player { public Hunter(String n) { super(n, "獵人", "好人"); } public void performNightAction(Player[] p, Scanner sc) {} }
+class Villager extends Player { public Villager(String n) { super(n, "村民", "好人"); } public void performNightAction(Player[] p, Scanner sc) {} }
+
+// --- 主程式 ---
+public class TeachingWerewolfGame {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("輸入總玩家人數: ");
+        int total = sc.nextInt();
+        
+        Player[] players = new Player[total];
+        // 角色分配邏輯：狼人、預言家、女巫、獵人 + 村民
+        for (int i = 0; i < total; i++) {
+            if (i == 0) players[i] = new Werewolf("玩家" + i);
+            else if (i == 1) players[i] = new Seer("玩家" + i);
+            else if (i == 2) players[i] = new Witch("玩家" + i);
+            else if (i == 3) players[i] = new Hunter("玩家" + i);
+            else players[i] = new Villager("玩家" + i);
+        }
+
+        // 1. 一開始顯示身份 (揭露)
+        System.out.println("\n=== 身份揭露 ===");
+        for (Player p : players) System.out.println(p.getName() + " 職業: " + p.getRole());
+
+        // 2. 遊戲迴圈
+        while (true) {
+            System.out.println("\n--- 夜晚行動 ---");
+            for (Player p : players) if (p.isAlive()) p.performNightAction(players, sc);
+            if (checkWin(players)) break;
+
+            System.out.println("\n--- 白天投票 ---");
+            for (int i = 0; i < total; i++) if (players[i].isAlive()) System.out.print(i + ":" + players[i].getName() + " ");
+            System.out.print("\n請輸入要投給誰的編號: ");
+            int v = sc.nextInt();
+            if (v >= 0 && v < total) players[v].setAlive(false);
+            
+            if (checkWin(players)) break;
+        }
+        sc.close();
+    }
+
+    public static boolean checkWin(Player[] players) {
+        int w = 0, g = 0;
+        for (Player p : players) {
+            if (p.isAlive()) {
+                if (p.getCamp().equals("壞人")) w++; else g++;
+            }
+        }
+        if (w == 0) { System.out.println("\n【好人陣營獲勝！】"); return true; }
+        if (w >= g) { System.out.println("\n【壞人陣營獲勝！】"); return true; }
+        return false;
+    }
+}
